@@ -1,0 +1,5 @@
+name: CWUtils
+main: com.clashwars.cwutils.bukkit.CWUtilsPlugin
+version: '1.0'
+author: ClashWars
+description: ClashWars Utils plugin
