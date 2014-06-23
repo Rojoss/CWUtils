@@ -10,10 +10,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemUtils {
 	
+	public static ItemStack getItem(int ID, int amount, short durability, String name, String[] alore){
+	    ItemStack item = new ItemStack(ID, amount);
+	    return getItem(item, durability, name, alore);
+	}
+	
 	public static ItemStack getItem(Material mat, int amount, short durability, String name, String[] alore){
 	    ItemStack item = new ItemStack(mat, amount);
-	    
-	    if (alore != null) {
+	    return getItem(item, durability, name, alore);
+	}
+	
+	public static ItemStack getItem(ItemStack item, short durability, String name, String[] alore) {
+		if (alore != null) {
 		    for (int i = 0; i < alore.length; i++) {
 		    	alore[i] = Utils.integrateColor(alore[i]);
 		    }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -121,71 +120,114 @@ public class DuelMenu implements Listener {
 	}
 	
 	
-	public void clickItem(Player player, ItemStack item, int slot) {
-		if (slot < 9) {
-			DuelRunnable dr = dm.getDuel(player);
-			switch (ChatColor.stripColor(item.getItemMeta().getDisplayName()).toLowerCase()) {
-				case "diamond armor":
-					dr.setArmor(Material.IRON_CHESTPLATE);
+	public void clickItem(DuelMenu menu, Player player, ItemStack item, int slot) {
+		DuelRunnable dr = dm.getDuel(player);
+		
+		//Coin management player 1.
+		if (slot == 1) {
+			dr.setPlayer1Coins(dr.getPlayer1Coins() + 100);
+			dm.setCoins(dr);
+		}
+		if (slot == 2) {
+			if (dr.getPlayer1Coins() < 100) {
+				dr.setPlayer1Coins(0);
+			} else {
+				dr.setPlayer1Coins(dr.getPlayer1Coins() - 100);
+			}
+			dm.setCoins(dr);
+		}
+		
+		//Coin management player 2.
+		if (slot == 7) {
+			dr.setPlayer1Coins(dr.getPlayer1Coins() + 100);
+			dm.setCoins(dr);
+		}
+		if (slot == 6) {
+			if (dr.getPlayer1Coins() < 100) {
+				dr.setPlayer1Coins(0);
+			} else {
+				dr.setPlayer1Coins(dr.getPlayer1Coins() - 100);
+			}
+			dm.setCoins(dr);
+		}
+		
+		//Ready up buttons.
+		if (slot == 3) {
+			if (dr.isPlayer1Ready()) {
+				dr.setPlayer1Ready(false);
+			} else {
+				dr.setPlayer1Ready(true);
+			}
+			dm.setReady(dr);
+		}
+		if (slot == 5) {
+			if (dr.isPlayer2Ready()) {
+				dr.setPlayer2Ready(false);
+			} else {
+				dr.setPlayer2Ready(true);
+			}
+			dm.setReady(dr);
+		}
+		
+		//Armor button.
+		if (slot == 22) {
+			switch (item.getType()) {
+				case DIAMOND_CHESTPLATE:
 					dm.setArmor(dr, Material.IRON_CHESTPLATE);
 					break;
-				case "iron armor":
-					dr.setArmor(Material.GOLD_CHESTPLATE);
+				case IRON_CHESTPLATE:
 					dm.setArmor(dr, Material.GOLD_CHESTPLATE);
 					break;
-				case "gold armor":
-					dr.setArmor(Material.LEATHER_CHESTPLATE);
+				case GOLD_CHESTPLATE:
 					dm.setArmor(dr, Material.LEATHER_CHESTPLATE);
 					break;
-				case "leather armor":
-					dr.setArmor(Material.STICK);
+				case LEATHER_CHESTPLATE:
 					dm.setArmor(dr, Material.STICK);
-					break;
-				case "no armor":
-					dr.setArmor(Material.DIAMOND_CHESTPLATE);
-					dm.setArmor(dr, Material.DIAMOND_CHESTPLATE);
-					break;
-				case "diamond sword":
-					dr.setArmor(Material.IRON_SWORD);
-					dm.setArmor(dr, Material.IRON_SWORD);
-					break;
-				case "iron sword":
-					dr.setArmor(Material.STONE_SWORD);
-					dm.setArmor(dr, Material.STONE_SWORD);
-					break;
-				case "stone sword":
-					dr.setArmor(Material.WOOD_SWORD);
-					dm.setArmor(dr, Material.WOOD_SWORD);
-					break;
-				case "wood sword":
-					dr.setArmor(Material.STICK);
-					dm.setArmor(dr, Material.STICK);
-					break;
-				case "no sword":
-					dr.setArmor(Material.DIAMOND_SWORD);
-					dm.setArmor(dr, Material.DIAMOND_SWORD);
-					break;
-				case "bow":
-					dr.setBow(false);
-					dm.setBow(dr, false);
-					break;
-				case "no bow":
-					dr.setBow(true);
-					dm.setBow(dr, true);
-					break;
-				case "potions":
-					dr.setPotions(false);
-					dm.setPotions(dr, false);
-					break;
-				case "no potions":
-					dr.setPotions(true);
-					dm.setPotions(dr, true);
 					break;
 				default:
+					dm.setArmor(dr, Material.DIAMOND_CHESTPLATE);
 					break;
 			}
 		}
-		//TODO: Dropping items in for slot 9 and above.
+		
+		//Weapon button.
+		if (slot == 31) {
+			switch (item.getType()) {
+				case DIAMOND_SWORD:
+					dm.setWeapon(dr, Material.IRON_SWORD);
+					break;
+				case IRON_SWORD:
+					dm.setWeapon(dr, Material.STONE_SWORD);
+					break;
+				case STONE_SWORD:
+					dm.setWeapon(dr, Material.WOOD_SWORD);
+					break;
+				case WOOD_SWORD:
+					dm.setWeapon(dr, Material.STICK);
+					break;
+				default:
+					dm.setWeapon(dr, Material.DIAMOND_SWORD);
+					break;
+			}
+		}
+		
+		//Bow button.
+		if (slot == 40) {
+			if (dr.getBow()) {
+				dm.setBow(dr, false);
+			} else {
+				dm.setBow(dr, true);
+			}
+		}
+		
+		//Potions button.
+		if (slot == 49) {
+			if (dr.getPotions()) {
+				dm.setPotions(dr, false);
+			} else {
+				dm.setPotions(dr, true);
+			}
+		}
 	}
 
 	public static class Events implements Listener {
@@ -221,7 +263,7 @@ public class DuelMenu implements Listener {
 					ItemStack item = menu.getItems()[i];
 					
 					if (item != null && i == raw) {
-						menu.clickItem(player, item, i);
+						menu.clickItem(menu, player, item, i);
 						
 						event.setCancelled(true);
 						event.setResult(Result.DENY);

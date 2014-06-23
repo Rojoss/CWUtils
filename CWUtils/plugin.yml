@@ -3,3 +3,8 @@ main: com.clashwars.cwutils.bukkit.CWUtilsPlugin
 version: '1.0'
 author: ClashWars
 description: ClashWars Utils plugin
+commands:
+    saveInv:
+        description: Save your inventory!
+    loadInv:
+        description: Load your saved inventory!

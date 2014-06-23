@@ -1,15 +1,18 @@
 package com.clashwars.cwutils.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class PluginConfig extends Config {
+public class PluginConfig {
 	private YamlConfiguration cfgFile;
 	private ConfigUtil cu;
 	private Config cfg;

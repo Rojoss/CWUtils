@@ -12,6 +12,7 @@ import com.clashwars.cwutils.bukkit.CWUtilsPlugin;
 import com.clashwars.cwutils.bukkit.events.CombatLogEvents;
 import com.clashwars.cwutils.bukkit.events.ObsidDestroyEvents;
 import com.clashwars.cwutils.config.Config;
+import com.clashwars.cwutils.config.PlayerBackupConfig;
 import com.clashwars.cwutils.config.PluginConfig;
 
 public class CWUtils {
@@ -20,6 +21,7 @@ public class CWUtils {
 	private final Logger log = Logger.getLogger("Minecraft");
 	
 	private PluginConfig pluginConfig;
+	private PlayerBackupConfig pbConfig;
 	private Config cfg;
 	private TagManager tm;
 	private DuelManager dm;
@@ -42,6 +44,9 @@ public class CWUtils {
 		pluginConfig = new PluginConfig(cfg);
 		pluginConfig.init();
 		pluginConfig.load();
+		
+		pbConfig = new PlayerBackupConfig(cfg);
+		pbConfig.init();
 		
 		registerEvents();
 		addRecipes();
@@ -84,6 +89,10 @@ public class CWUtils {
 	
 	public Config getConfig() {
 		return cfg;
+	}
+	
+	public PlayerBackupConfig getPBConfig() {
+		return pbConfig;
 	}
 	
 	public TagManager getTM() {

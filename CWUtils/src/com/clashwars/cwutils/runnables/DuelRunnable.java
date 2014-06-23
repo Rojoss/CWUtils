@@ -23,6 +23,11 @@ public class DuelRunnable implements Runnable {
 	private boolean potions;
 	private long startTime;
 	
+	private int player1Coins = 0;
+	private int player2Coins = 0;
+	private boolean player1Ready = false;
+	private boolean player2Ready = false;
+	
 	public DuelRunnable(CWUtils cwu, DuelMenu menu, Player player1, Player player2) {
 		this.cwu = cwu;
 		this.menu = menu;
@@ -30,21 +35,6 @@ public class DuelRunnable implements Runnable {
 		this.player2 = player2;
 	}
 	
-	public void setArmor(Material armorType) {
-		this.armorType = armorType;
-	}
-	
-	public void setWeapon(Material weapon) {
-		this.weaponType = weapon;
-	}
-	
-	public void setBow(boolean bow) {
-		this.bow = bow;
-	}
-	
-	public void setPotions(boolean potions) {
-		this.potions = potions;
-	}
 	
 	public int getTimeLeft() {
 		return (int) ((startTime + cwu.getConfig().getTagTime()) - System.currentTimeMillis() / 1000);
@@ -60,6 +50,59 @@ public class DuelRunnable implements Runnable {
 	
 	public DuelMenu getMenu() {
 		return menu;
+	}
+	
+	
+	
+	public int getPlayer1Coins() {
+		return player1Coins;
+	}
+	public int getPlayer2Coins() {
+		return player2Coins;
+	}
+	
+	public void setPlayer1Coins(int coins) {
+		player1Coins = coins;
+	}
+	public void setPlayer2Coins(int coins) {
+		player2Coins = coins;
+	}
+	
+	public boolean isPlayer1Ready() {
+		return player1Ready;
+	}
+	public boolean isPlayer2Ready() {
+		return player2Ready;
+	}
+	
+	public void setPlayer1Ready(boolean ready) {
+		player1Ready = ready;
+	}
+	public void setPlayer2Ready(boolean ready) {
+		player2Ready = ready;
+	}
+	
+	
+	public void setArmor(Material armorType) {
+		this.armorType = armorType;
+	}
+	
+	public void setWeapon(Material weapon) {
+		this.weaponType = weapon;
+	}
+	
+	public boolean getBow() {
+		return bow;
+	}
+	public void setBow(boolean bow) {
+		this.bow = bow;
+	}
+	
+	public boolean getPotions() {
+		return bow;
+	}
+	public void setPotions(boolean potions) {
+		this.potions = potions;
 	}
 	
 	
