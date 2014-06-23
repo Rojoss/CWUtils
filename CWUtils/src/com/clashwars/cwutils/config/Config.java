@@ -10,6 +10,7 @@ public class Config {
 	private int tagTime;
 	private List<String> blockedCmds;
 	private Map<UUID, List<String>> messages;
+	private Map<String, Boolean> status;
 	
 	//Tag time
 	public int getTagTime() {
@@ -60,5 +61,13 @@ public class Config {
 				messages.put(player, list);
 			}
 		}
+	}
+
+	//Enable/Disable certain plugin elements.
+	public void setStatus(String element, boolean bool) {
+		status.put(element, bool);
+	}
+	public boolean getStatus(String element) {
+		return status.get(element);
 	}
 }

@@ -21,7 +21,8 @@ public class CWUtils {
 	
 	private PluginConfig pluginConfig;
 	private Config cfg;
-	private PlayerTagger cl;
+	private TagManager tm;
+	private DuelManager dm;
 
 	public CWUtils(CWUtilsPlugin cwu) {
 		this.cwu = cwu;
@@ -45,7 +46,11 @@ public class CWUtils {
 		registerEvents();
 		addRecipes();
 		
-		cl = new PlayerTagger(this);
+		if (cfg.getStatus("tagging")) {
+			tm = new TagManager(this);
+		}
+		
+		dm = new DuelManager(this);
 		
 		log("Enabled.");
 	}
@@ -58,13 +63,15 @@ public class CWUtils {
 	
 	private void addRecipes() {
 		//Custom enderchest recipe.
-		ShapedRecipe echest = new ShapedRecipe(new ItemStack(Material.ENDER_CHEST, 1));
-		echest.shape("$&$", "#@#", "###");
-		echest.setIngredient('$', Material.DIAMOND_BLOCK);
-		echest.setIngredient('&', Material.NETHER_STAR);
-		echest.setIngredient('@', Material.EYE_OF_ENDER);
-		echest.setIngredient('#', Material.OBSIDIAN);
-		getServer().addRecipe(echest);
+		if (cfg.getStatus("enderchestRecipe")) {
+			ShapedRecipe echest = new ShapedRecipe(new ItemStack(Material.ENDER_CHEST, 1));
+			echest.shape("$&$", "#@#", "###");
+			echest.setIngredient('$', Material.DIAMOND_BLOCK);
+			echest.setIngredient('&', Material.NETHER_STAR);
+			echest.setIngredient('@', Material.EYE_OF_ENDER);
+			echest.setIngredient('#', Material.OBSIDIAN);
+			getServer().addRecipe(echest);
+		}
 	}
 
 	public CWUtilsPlugin getPlugin() {
@@ -79,8 +86,11 @@ public class CWUtils {
 		return cfg;
 	}
 	
-	public PlayerTagger getCL() {
-		return cl;
+	public TagManager getTM() {
+		return tm;
 	}
 
+	public DuelManager getDM() {
+		return dm;
+	}
 }

@@ -35,6 +35,14 @@ public class PluginConfig extends Config {
 		try {
 			cfgFile.load(file);
 			
+			//Section enabling/disabling
+			cfg.setStatus("tagging", cu.getBoolean("setEnabled.tagging", true));
+			cfg.setStatus("enderchestRecipe", cu.getBoolean("setEnabled.enderchestRecipe", true));
+			cfg.setStatus("enderchestBlock", cu.getBoolean("setEnabled.enderchestBlock", true));
+			cfg.setStatus("blackpowder", cu.getBoolean("setEnabled.blackpowder", true));
+			cfg.setStatus("c4", cu.getBoolean("setEnabled.c4", true));
+			cfg.setStatus("destroyableObsidian", cu.getBoolean("setEnabled.destroyableObsidian", true));
+			
 			// Combat logging
 			cfg.setTagTime(cu.getInt("combatLog.tagTime", 30));
 			cfg.setBlockedCmds(cu.getStringList("combatLog.blockedCmds", new String[] { "EXAMPLE_CMD", "/EXAMPLE_CMD_2 ARG1" }));

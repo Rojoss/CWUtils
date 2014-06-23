@@ -8,13 +8,13 @@ import org.bukkit.entity.Player;
 import com.clashwars.cwutils.runnables.TagRunnable;
 import com.clashwars.cwutils.util.Utils;
 
-public class PlayerTagger {
+public class TagManager {
 	
 	private CWUtils cwu;
 	Map<Player, TagRunnable> tags = new HashMap<Player, TagRunnable>();
 	
 	
-	public PlayerTagger(CWUtils cwu) {
+	public TagManager(CWUtils cwu) {
 		this.cwu = cwu;
 	}
 	

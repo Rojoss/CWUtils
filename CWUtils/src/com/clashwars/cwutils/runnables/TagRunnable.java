@@ -37,13 +37,13 @@ public class TagRunnable implements Runnable {
 	public void run() {
 		try {
 			while ((startTime + cwu.getConfig().getTagTime()) < System.currentTimeMillis()) {
-				Thread.sleep(1000);
+				Thread.sleep(100);
 				
 				if (tagged.isDead() || tagger.isDead() || getTimeLeft() <= 0) {
 					break;
 				}
 			}
-			cwu.getCL().removeTag(tagged);
+			cwu.getTM().removeTag(tagged);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

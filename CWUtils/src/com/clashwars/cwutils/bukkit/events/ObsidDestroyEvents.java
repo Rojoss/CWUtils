@@ -42,12 +42,14 @@ public class ObsidDestroyEvents implements Listener {
 		World world = block.getWorld();
 
 		// Randomly give blackpowder
-		if (block.getType().equals(Material.GRAVEL)) {
-			Random random = new Random();
-			if (random.nextInt(5) == 1) {
-				world.dropItemNaturally(event.getBlock().getLocation(), blackPowderItem());
+		if (cwu.getConfig().getStatus("blackpowder")) {
+			if (block.getType().equals(Material.GRAVEL)) {
+				Random random = new Random();
+				if (random.nextInt(5) == 1) {
+					world.dropItemNaturally(event.getBlock().getLocation(), blackPowderItem());
+				}
+				return;
 			}
-			return;
 		}
 
 		// Give C4 item back if the tnt block is C4 and reset the block.
@@ -87,36 +89,40 @@ public class ObsidDestroyEvents implements Listener {
 	// Custom recipe for C4.
 	@EventHandler
 	public void onPrepareCraft(PrepareItemCraftEvent event) {
-		if (event.getRecipe().getResult().getType() == Material.TNT) {
-			ItemStack[] ingredients = event.getInventory().getContents();
-			int blackPowder = 0;
-			for (ItemStack ingredient : ingredients) {
-				if (ingredient.getType() == Material.SULPHUR) {
-					if (ingredient.hasItemMeta()) {
-						ItemMeta meta = ingredient.getItemMeta();
-						if (meta.getDisplayName().contains("Blackpowder")) {
-							blackPowder++;
+		if (cwu.getConfig().getStatus("c4")) {
+			if (event.getRecipe().getResult().getType() == Material.TNT) {
+				ItemStack[] ingredients = event.getInventory().getContents();
+				int blackPowder = 0;
+				for (ItemStack ingredient : ingredients) {
+					if (ingredient.getType() == Material.SULPHUR) {
+						if (ingredient.hasItemMeta()) {
+							ItemMeta meta = ingredient.getItemMeta();
+							if (meta.getDisplayName().contains("Blackpowder")) {
+								blackPowder++;
+							}
 						}
 					}
 				}
-			}
-			if (blackPowder > 0 && blackPowder < 5) {
-				event.getInventory().setResult(null);
-			}
-			if (blackPowder >= 5) {
-				event.getInventory().setResult(c4Item());
+				if (blackPowder > 0 && blackPowder < 5) {
+					event.getInventory().setResult(null);
+				}
+				if (blackPowder >= 5) {
+					event.getInventory().setResult(c4Item());
+				}
 			}
 		}
 		
-		//Prevent ender chest creation.
-		if (event.getRecipe().getResult().getType() == Material.ENDER_CHEST) {
-			ItemStack[] ingredients = event.getInventory().getContents();
-			for (ItemStack ingredient : ingredients) {
-				if (ingredient.getType() == Material.NETHER_STAR) {
-					return;
+		if (cwu.getConfig().getStatus("enderchestBlock")) {
+			//Prevent ender chest creation.
+			if (event.getRecipe().getResult().getType() == Material.ENDER_CHEST) {
+				ItemStack[] ingredients = event.getInventory().getContents();
+				for (ItemStack ingredient : ingredients) {
+					if (ingredient.getType() == Material.NETHER_STAR) {
+						return;
+					}
 				}
+				event.getInventory().setResult(invalidEnderChest());
 			}
-			event.getInventory().setResult(invalidEnderChest());
 		}
 	}
 
@@ -132,6 +138,9 @@ public class ObsidDestroyEvents implements Listener {
 
 	// check if a block is C4 and if it is ignite it.
 	private void igniteC4(final Block block) {
+		if (!cwu.getConfig().getStatus("c4")) {
+			return;
+		}
 		if (!block.getType().equals(Material.TNT)) {
 			return;
 		}
@@ -155,6 +164,9 @@ public class ObsidDestroyEvents implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onEntityExplode(EntityExplodeEvent event) {
+		if (!cwu.getConfig().getStatus("destroyableObsidian")) {
+			return;
+		}
 		if (event.getEntity().getType() != EntityType.PRIMED_TNT) {
 			return;
 		}

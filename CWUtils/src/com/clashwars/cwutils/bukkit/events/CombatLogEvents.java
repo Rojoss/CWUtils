@@ -30,7 +30,7 @@ public class CombatLogEvents implements Listener {
 	//Tag players when hit.
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void playerTakeDamage(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
+		if (event.isCancelled() || !cwu.getConfig().getStatus("tagging")) {
 			return;
 		}
 		if (!(event.getEntity() instanceof Player)) {
@@ -51,7 +51,7 @@ public class CombatLogEvents implements Listener {
 		
 		//TODO: Potions and maybe other damage sources.
 		
-		cwu.getCL().tag((Player)event.getEntity(), damager);
+		cwu.getTM().tag((Player)event.getEntity(), damager);
 	}
 	
 	
@@ -65,12 +65,15 @@ public class CombatLogEvents implements Listener {
 		combatLog(event.getPlayer());
 	}
 	private void combatLog(Player player) {
-		if (cwu.getCL().isTagged(player)) {
+		if (!cwu.getConfig().getStatus("tagging")) {
+			return;
+		}
+		if (cwu.getTM().isTagged(player)) {
 			player.setHealth((double)0);
 			cwu.getConfig().addMessage(player.getUniqueId(), "&8[&4CW Tag&8] &c&lYou where killed for combat logging!");
-			cwu.getConfig().addMessage(player.getUniqueId(), "&8[&4CW Tag&8] &4" + cwu.getCL().getTagger(player) + " &chad tagged you!");
+			cwu.getConfig().addMessage(player.getUniqueId(), "&8[&4CW Tag&8] &4" + cwu.getTM().getTagger(player) + " &chad tagged you!");
 			Bukkit.broadcastMessage(Utils.integrateColor("&8[&4CW Tag&8] &4" + player.getName() + " &ccombat logged!"));
-			cwu.getCL().removeTag(player);
+			cwu.getTM().removeTag(player);
 		}
 	}
 	
@@ -92,9 +95,12 @@ public class CombatLogEvents implements Listener {
 	//Prevent teleportation when tagged.
 	@EventHandler
 	public void onTeleport(EntityTeleportEvent event) {
+		if (!cwu.getConfig().getStatus("tagging")) {
+			return;
+		}
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			if (cwu.getCL().isTagged(player)) {
+			if (cwu.getTM().isTagged(player)) {
 				event.setCancelled(true);
 			}
 		}
@@ -104,10 +110,13 @@ public class CombatLogEvents implements Listener {
 	//Prevent using certain commands when tagged.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void commandPre(PlayerCommandPreprocessEvent event) {
+		if (!cwu.getConfig().getStatus("tagging")) {
+			return;
+		}
 		Player player = event.getPlayer();
 		String msg = event.getMessage();
 
-		if (cwu.getCL().isTagged(player)) {
+		if (cwu.getTM().isTagged(player)) {
 			List<String> cmds = cwu.getConfig().getBlockedCmds();
 			for (String cmd : cmds) {
 				if (msg.toLowerCase().trim().startsWith(cmd.toLowerCase().trim()) || msg.toLowerCase().trim().substring(1).startsWith(cmd.toLowerCase().trim())) {
