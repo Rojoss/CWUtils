@@ -10,13 +10,14 @@ import org.bukkit.plugin.PluginManager;
 
 import com.clashwars.cwutils.bukkit.CWUtilsPlugin;
 import com.clashwars.cwutils.bukkit.events.CombatLogEvents;
+import com.clashwars.cwutils.bukkit.events.DuelEvents;
 import com.clashwars.cwutils.bukkit.events.ObsidDestroyEvents;
 import com.clashwars.cwutils.config.Config;
 import com.clashwars.cwutils.config.PlayerBackupConfig;
 import com.clashwars.cwutils.config.PluginConfig;
 
 public class CWUtils {
-
+	
 	private CWUtilsPlugin cwu;
 	private final Logger log = Logger.getLogger("Minecraft");
 	
@@ -45,9 +46,6 @@ public class CWUtils {
 		pluginConfig.init();
 		pluginConfig.load();
 		
-		pbConfig = new PlayerBackupConfig(cfg);
-		pbConfig.init();
-		
 		registerEvents();
 		addRecipes();
 		
@@ -55,7 +53,11 @@ public class CWUtils {
 			tm = new TagManager(this);
 		}
 		
-		dm = new DuelManager(this);
+		if (cfg.getStatus("duels")) {
+			pbConfig = new PlayerBackupConfig(cfg);
+			pbConfig.init();
+			dm = new DuelManager(this);
+		}
 		
 		log("Enabled.");
 	}
@@ -64,6 +66,10 @@ public class CWUtils {
 		PluginManager pm = getPlugin().getServer().getPluginManager();
 		pm.registerEvents(new ObsidDestroyEvents(this), getPlugin());
 		pm.registerEvents(new CombatLogEvents(this), getPlugin());
+		if (cfg.getStatus("duels")) {
+			pm.registerEvents(new DuelMenu.Events(), getPlugin());
+			pm.registerEvents(new DuelEvents(this), getPlugin());
+		}
 	}
 	
 	private void addRecipes() {

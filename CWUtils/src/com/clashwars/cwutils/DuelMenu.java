@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -122,6 +123,8 @@ public class DuelMenu implements Listener {
 	
 	public void clickItem(DuelMenu menu, Player player, ItemStack item, int slot) {
 		DuelRunnable dr = dm.getDuel(player);
+		
+		Bukkit.broadcastMessage("Clicking slot " + slot);
 		
 		//Coin management player 1.
 		if (slot == 1) {
@@ -245,7 +248,28 @@ public class DuelMenu implements Listener {
 				int raw = event.getRawSlot();
 				boolean top = raw <= menu.getSize();
 				
-				if (!top) {
+				boolean correctSide = false;
+				
+				for (int y = 0; y < menu.getSize(); y += 9) {
+					for (int x = 0; x < 9; x++) {
+						int slot = y + x;
+						if (slot == raw) {
+							if (x < 5) {
+								if (menu.dm.getDuel(player).getPlayer1() == player) {
+									correctSide = true;
+								}
+							} else {
+								if (menu.dm.getDuel(player).getPlayer2() == player) {
+									correctSide = true;
+								}
+							}
+							break;
+						}
+					}
+				}
+				
+				
+				if (!correctSide) {
 					event.setCancelled(true);
 					event.setResult(Result.DENY);
 					event.setCursor(null);
@@ -271,6 +295,21 @@ public class DuelMenu implements Listener {
 						player.updateInventory();
 					}
 				}
+			}
+		}
+		
+		@EventHandler(priority = EventPriority.HIGHEST)
+		public void close(InventoryCloseEvent event) {
+			Player player = (Player) event.getPlayer();
+			Inventory inv = event.getInventory();
+			
+			for (DuelMenu menu : menus) {
+				if (!inv.getTitle().equals(menu.getTitle()) || inv.getSize() != menu.getSize() || !inv.getHolder().equals(player)) {
+					continue;
+				}
+				
+				menu.getOpenInvs().remove(inv);
+				menu.dm.cancelSetup(player, menu.dm.getDuel(player).getPlayer2());
 			}
 		}
 	}

@@ -72,18 +72,6 @@ public class PlayerBackup {
 		}
 	}
 	
-	public void resetPlayer(Player player) {
-		player.getInventory().clear();
-		player.setHealth((double) 20);
-		player.setFoodLevel(20);
-		player.setExp(0f);
-		player.setLevel(0);
-		for (PotionEffect effect : player.getActivePotionEffects()) {
-			player.removePotionEffect(effect.getType());
-		}
-		player.setFireTicks(0);
-	}
-	
 	
 	
 	

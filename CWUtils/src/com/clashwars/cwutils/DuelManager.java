@@ -1,5 +1,6 @@
 package com.clashwars.cwutils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Material;
@@ -11,8 +12,29 @@ import com.clashwars.cwutils.util.Utils;
 
 public class DuelManager {
 	
+	/*
+	TODO:
+	- Save everything else in PlayerBackup not just inventory.
+	- On player reset clear armor slots aswell.
+	- Cancel start scheduler somehow.
+	- Allow putting items in the menu.
+	- Fix the money take/add buttons.
+	- Take input items/money from player that lost and give it to the winner.
+	- Don't drop items when a player is killed.
+	- Fix players not getting reset when someone is killed.
+	- Fix where it cancels like 10 times sometimes.
+	- Create the /duel command and check for distance etc.
+	- Save player location + world and teleport players back to original location.
+	- Make sure players can't duel at places where there is no pvp.
+	- Make it so players who are dueling can't be attacked.
+	- Make it so dueling players can't attack other players.
+	- Make it so you don't lose faction power when dueling
+	- Make sure no duel items can be glitched out.
+	- Make sure player can't take duel items by logging out.
+	*/
+	
 	private CWUtils cwu;
-	private Map<Player, DuelRunnable> duels;
+	private Map<Player, DuelRunnable> duels = new HashMap<Player, DuelRunnable>();
 	
 	public DuelManager(CWUtils cwu) {
 		this.cwu = cwu;
@@ -20,7 +42,7 @@ public class DuelManager {
 	
 	//Create a new duel between 2 players.
 	public void createDuel(Player player1, Player player2) {
-		DuelMenu menu = new DuelMenu(this, player1.getName() + player2.getName(), 27, "&4&lDuel: &r" + player1.getName() + "<~>" + player2.getName());
+		DuelMenu menu = new DuelMenu(this, player1.getName() + player2.getName(), 54, "&4&lDuel setup");
 		
 		DuelRunnable dr = null;
 		if (!duels.containsKey(player1)) {
@@ -32,15 +54,12 @@ public class DuelManager {
 		
 		//TODO: set these to saved defaults.
 		setDefaults(dr);
+		setReady(dr);
+		setCoins(dr);
 		setArmor(dr, Material.DIAMOND_CHESTPLATE);
 		setWeapon(dr, Material.DIAMOND_SWORD);
 		setBow(dr, true);
 		setPotions(dr, true);
-		
-		
-		
-		
-		//menu.setSlot(new Entry(null, 0, null), 0);
 		
 		menu.show(player1);
 		menu.show(player2);
@@ -50,17 +69,9 @@ public class DuelManager {
 		//Get the ending message.
 		String message = "&8[&4CW Duel&8] &cThe time has ran out! Nobody wins.";
 		if (winner == player1) {
-			if (player2.isDead()) {
-				message = "&8[&4CW Duel&8] &a&l" + player1.getName() + " &6wins by killing " + player2.getName();
-			} else {
-				message = "&8[&4CW Duel&8] &a&l" + player1.getName() + " &6because " + player2.getName() + " logged off.";
-			}
+			message = "&8[&4CW Duel&8] &a&l" + player1.getName() + " &6wins by killing " + player2.getName();
 		} else {
-			if (player1.isDead()) {
-				message = "&8[&4CW Duel&8] &a&l" + player2.getName() + " &6wins by killing " + player1.getName();
-			} else {
-				message = "&8[&4CW Duel&8] &a&l" + player2.getName() + " &6because " + player1.getName() + " logged off.";
-			}
+			message = "&8[&4CW Duel&8] &a&l" + player2.getName() + " &6wins by killing " + player1.getName();
 		}
 		
 		//Send the actual message if online otherwise send it on login.
@@ -74,7 +85,23 @@ public class DuelManager {
 		} else {
 			cwu.getConfig().addMessage(player2.getUniqueId(), message);
 		}
+		duels.remove(player1);
+		player1.closeInventory();
+		player2.closeInventory();
 		
+		Utils.resetPlayer(player1);
+		Utils.resetPlayer(player2);
+
+		cwu.getPBConfig().load(player1.getUniqueId());
+		cwu.getPBConfig().load(player2.getUniqueId());
+	}
+	
+	public void cancelSetup(Player player1, Player player2) {
+		player1.sendMessage(Utils.integrateColor("&8[&4CW Duel&8] &cThe duel has been cancelled."));
+		player2.sendMessage(Utils.integrateColor("&8[&4CW Duel&8] &cThe duel has been cancelled."));
+		duels.remove(player1);
+		player1.closeInventory();
+		player2.closeInventory();
 	}
 	
 	public void start(Player player1, Player player2) {
@@ -103,14 +130,18 @@ public class DuelManager {
 	
 	public void setReady(DuelRunnable dr) {
 		if (dr.isPlayer1Ready()) {
-			dr.getMenu().setSlot(ItemUtils.getItem(175, 1, (short)0, "&a&lReady!", new String[] {"&7Wait for the other player to ready up."}), 3);
+			dr.getMenu().setSlot(ItemUtils.getItem(Material.INK_SACK, 1, (short)10, "&a&lReady!", new String[] {"&7Wait for the other player to ready up."}), 3);
 		} else {
-			dr.getMenu().setSlot(ItemUtils.getItem(175, 1, (short)0, "&c&lNot ready!", new String[] {"&7Click when you're ready!"}), 3);
+			dr.getMenu().setSlot(ItemUtils.getItem(Material.INK_SACK, 1, (short)8, "&c&lNot ready!", new String[] {"&7Click when you're ready!"}), 3);
 		}
 		if (dr.isPlayer2Ready()) {
-			dr.getMenu().setSlot(ItemUtils.getItem(175, 1, (short)0, "&a&lReady!", new String[] {"&7Wait for the other player to ready up."}), 5);
+			dr.getMenu().setSlot(ItemUtils.getItem(Material.INK_SACK, 1, (short)10, "&a&lReady!", new String[] {"&7Wait for the other player to ready up."}), 5);
 		} else {
-			dr.getMenu().setSlot(ItemUtils.getItem(175, 1, (short)0, "&c&lNot ready!", new String[] {"&7Click when you're ready!"}), 5);
+			dr.getMenu().setSlot(ItemUtils.getItem(Material.INK_SACK, 1, (short)8, "&c&lNot ready!", new String[] {"&7Click when you're ready!"}), 5);
+		}
+		
+		if (dr.isPlayer1Ready() && dr.isPlayer2Ready()) {
+			start(dr.getPlayer1(), dr.getPlayer2());
 		}
 	}
 	
@@ -193,6 +224,5 @@ public class DuelManager {
 			dr.getMenu().setSlot(ItemUtils.getItem(Material.GLASS_BOTTLE, 1, (short)0, "&4&lNo Potions", null), 49);
 		}
 	}
-	
 	
 }

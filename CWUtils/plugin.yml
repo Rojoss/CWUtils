@@ -4,7 +4,7 @@ version: '1.0'
 author: ClashWars
 description: ClashWars Utils plugin
 commands:
-    saveInv:
+    duel:
         description: Save your inventory!
     loadInv:
         description: Load your saved inventory!

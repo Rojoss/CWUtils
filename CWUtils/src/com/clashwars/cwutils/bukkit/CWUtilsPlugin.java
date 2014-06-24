@@ -1,8 +1,5 @@
 package com.clashwars.cwutils.bukkit;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.clashwars.cwutils.CWUtils;
@@ -23,10 +20,20 @@ public class CWUtilsPlugin extends JavaPlugin {
 		return cwu;
 	}
 	
+	/*
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		Player player = (Player)sender;
-		if (commandLabel.equalsIgnoreCase("saveInv")) {
-			cwu.getPBConfig().save(player.getUniqueId());
+		if (commandLabel.equalsIgnoreCase("duel")) {
+			if (args.length >= 1) {
+				if (Bukkit.getPlayer(args[0]) != null) {
+					cwu.getDM().createDuel(player, Bukkit.getPlayer(args[0]));
+				} else {
+					player.sendMessage("Invalid player");
+				}
+			} else {
+				player.sendMessage("Usage: /duel <player>");
+			}
+			//cwu.getPBConfig().save(player.getUniqueId());
 		}
 		if (commandLabel.equalsIgnoreCase("loadInv")) {
 			cwu.getPBConfig().load(player.getUniqueId());
@@ -34,7 +41,5 @@ public class CWUtilsPlugin extends JavaPlugin {
 		
 		return false;
 	}
-	
-	
-	
+	*/
 }

@@ -45,10 +45,15 @@ public class PluginConfig {
 			cfg.setStatus("blackpowder", cu.getBoolean("setEnabled.blackpowder", true));
 			cfg.setStatus("c4", cu.getBoolean("setEnabled.c4", true));
 			cfg.setStatus("destroyableObsidian", cu.getBoolean("setEnabled.destroyableObsidian", true));
+			cfg.setStatus("duels", cu.getBoolean("setEnabled.duels", false));
 			
 			// Combat logging
 			cfg.setTagTime(cu.getInt("combatLog.tagTime", 30));
 			cfg.setBlockedCmds(cu.getStringList("combatLog.blockedCmds", new String[] { "EXAMPLE_CMD", "/EXAMPLE_CMD_2 ARG1" }));
+			
+			//Duel
+			
+			
 			
 			//Queued messages
 			Map<UUID, List<String>> messages = new HashMap<UUID, List<String>>();
