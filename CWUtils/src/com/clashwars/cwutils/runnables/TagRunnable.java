@@ -1,5 +1,6 @@
 package com.clashwars.cwutils.runnables;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.clashwars.cwutils.CWUtils;
@@ -25,7 +26,7 @@ public class TagRunnable implements Runnable {
 	}
 	
 	public int getTimeLeft() {
-		return (int) ((startTime + cwu.getConfig().getTagTime()) - System.currentTimeMillis() / 1000);
+		return (int) (((startTime + (cwu.getConfig().getTagTime() * 1000)) - System.currentTimeMillis()) / 1000);
 	}
 	
 	public void resetTime(Player tagger) {
@@ -36,10 +37,10 @@ public class TagRunnable implements Runnable {
 	@Override
 	public void run() {
 		try {
-			while ((startTime + cwu.getConfig().getTagTime()) < System.currentTimeMillis()) {
+			while ((startTime + (cwu.getConfig().getTagTime() * 1000)) > System.currentTimeMillis() && cwu.isEnabled()) {
 				Thread.sleep(100);
 				
-				if (tagged.isDead() || tagger.isDead() || getTimeLeft() <= 0) {
+				if (getTimeLeft() <= 0) {
 					break;
 				}
 			}

@@ -2,6 +2,7 @@ package com.clashwars.cwutils;
 
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +21,7 @@ public class CWUtils {
 	
 	private CWUtilsPlugin cwu;
 	private final Logger log = Logger.getLogger("Minecraft");
+	private boolean enabled;
 	
 	private PluginConfig pluginConfig;
 	private PlayerBackupConfig pbConfig;
@@ -36,6 +38,8 @@ public class CWUtils {
 	}
 
 	public void onDisable() {
+		enabled = false;
+		getServer().getScheduler().cancelTasks(this.getPlugin());
 		pluginConfig.save();
 		log("Disabled.");
 	}
@@ -59,6 +63,7 @@ public class CWUtils {
 			dm = new DuelManager(this);
 		}
 		
+		enabled = true;
 		log("Enabled.");
 	}
 
@@ -91,6 +96,10 @@ public class CWUtils {
 
 	public Server getServer() {
 		return getPlugin().getServer();
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
 	}
 	
 	public Config getConfig() {

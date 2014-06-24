@@ -5,11 +5,13 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -54,27 +56,44 @@ public class CombatLogEvents implements Listener {
 		cwu.getTM().tag((Player)event.getEntity(), damager);
 	}
 	
-	
-	//Kill player if he is tagged for quit and kick.
+	//Remove tag on death
 	@EventHandler
-	public void onQuit(PlayerQuitEvent event) {
-		combatLog(event.getPlayer());
-	}
-	@EventHandler
-	public void onQuit(PlayerKickEvent event) {
-		combatLog(event.getPlayer());
-	}
-	private void combatLog(Player player) {
+	public void onDeath(PlayerDeathEvent event) {
 		if (!cwu.getConfig().getStatus("tagging")) {
 			return;
 		}
+		cwu.getTM().removeTag((Player)event.getEntity());
+	}
+	
+	
+	//Kill player if he is tagged for quit and kick.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onQuit(PlayerQuitEvent event) {
+		if (!cwu.getConfig().getStatus("tagging")) {
+			return;
+		}
+		
+		Player player = event.getPlayer();
+		if (player.isDead()) {
+			return;
+		}
+		
 		if (cwu.getTM().isTagged(player)) {
-			player.setHealth((double)0);
+			player.setHealth(0);
 			cwu.getConfig().addMessage(player.getUniqueId(), "&8[&4CW Tag&8] &c&lYou where killed for combat logging!");
 			cwu.getConfig().addMessage(player.getUniqueId(), "&8[&4CW Tag&8] &4" + cwu.getTM().getTagger(player) + " &chad tagged you!");
-			Bukkit.broadcastMessage(Utils.integrateColor("&8[&4CW Tag&8] &4" + player.getName() + " &ccombat logged!"));
+			Bukkit.broadcastMessage(Utils.integrateColor("&8[&4CW Tag&8] &9&l" + player.getName() + " &3combat logged!"));
 			cwu.getTM().removeTag(player);
 		}
+	}
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onKick(PlayerKickEvent event) {
+		if (!cwu.getConfig().getStatus("tagging")) {
+			return;
+		}
+		
+		cwu.getTM().removeTag(event.getPlayer());
 	}
 	
 	
@@ -120,7 +139,7 @@ public class CombatLogEvents implements Listener {
 			List<String> cmds = cwu.getConfig().getBlockedCmds();
 			for (String cmd : cmds) {
 				if (msg.toLowerCase().trim().startsWith(cmd.toLowerCase().trim()) || msg.toLowerCase().trim().substring(1).startsWith(cmd.toLowerCase().trim())) {
-					player.sendMessage("&8[&4CW Tag&8] &cYou can't use this command while tagged!");
+					player.sendMessage(Utils.integrateColor("&8[&4CW Tag&8] &cYou can't use this command while tagged!"));
 					event.setCancelled(true);
 					break;
 				}
