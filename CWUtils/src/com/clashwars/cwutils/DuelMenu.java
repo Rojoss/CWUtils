@@ -246,7 +246,7 @@ public class DuelMenu implements Listener {
 				}
 				
 				int raw = event.getRawSlot();
-				boolean top = raw <= menu.getSize();
+				//boolean top = raw <= menu.getSize();
 				
 				boolean correctSide = false;
 				

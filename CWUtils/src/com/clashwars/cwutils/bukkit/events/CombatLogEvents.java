@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -49,6 +48,9 @@ public class CombatLogEvents implements Listener {
 			if (projSrc instanceof Player) {
 				damager = (Player) projSrc;
 			}
+		}
+		if (damager == null) {
+			return;
 		}
 		
 		//TODO: Potions and maybe other damage sources.

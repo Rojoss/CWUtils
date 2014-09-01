@@ -4,7 +4,7 @@ version: '1.0'
 author: ClashWars
 description: ClashWars Utils plugin
 commands:
-    duel:
-        description: Save your inventory!
-    loadInv:
-        description: Load your saved inventory!
+    reward:
+        description: Give a random reward.
+    alts:
+        description: Check alts.

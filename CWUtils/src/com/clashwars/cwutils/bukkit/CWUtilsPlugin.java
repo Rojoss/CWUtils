@@ -1,5 +1,7 @@
 package com.clashwars.cwutils.bukkit;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.clashwars.cwutils.CWUtils;
@@ -18,6 +20,11 @@ public class CWUtilsPlugin extends JavaPlugin {
 
 	public CWUtils getInstance() {
 		return cwu;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		return cwu.onCommand(sender, cmd, label, args);
 	}
 	
 	/*

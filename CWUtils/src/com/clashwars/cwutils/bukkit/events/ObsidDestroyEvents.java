@@ -14,10 +14,12 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -30,6 +32,7 @@ import com.clashwars.cwutils.util.ItemUtils;
 
 public class ObsidDestroyEvents implements Listener {
 	private CWUtils cwu;
+	Random random = new Random();
 
 	public ObsidDestroyEvents(CWUtils cwu) {
 		this.cwu = cwu;
@@ -44,8 +47,8 @@ public class ObsidDestroyEvents implements Listener {
 		// Randomly give blackpowder
 		if (cwu.getConfig().getStatus("blackpowder")) {
 			if (block.getType().equals(Material.GRAVEL)) {
-				Random random = new Random();
-				if (random.nextInt(5) == 1) {
+				float chance = random.nextFloat();
+				if (chance <= 0.015f) { /* 1.5% chance so breaking 60 should give 1 average */
 					world.dropItemNaturally(event.getBlock().getLocation(), blackPowderItem());
 				}
 				return;
@@ -63,6 +66,18 @@ public class ObsidDestroyEvents implements Listener {
 			return;
 		}
 		return;
+	}
+	
+	//Get Blackpowder from creepers.
+	@EventHandler
+	public void EntityDeath(EntityDeathEvent event) {
+		if (event.getEntity().getType() != EntityType.CREEPER) {
+			return;
+		}
+		float chance = random.nextFloat();
+		if (chance <= 0.025f) { /* 2.5% chance so killing 40 should give 1 average */
+			event.getDrops().add(blackPowderItem());
+		}
 	}
 
 	// Place C4
@@ -162,7 +177,7 @@ public class ObsidDestroyEvents implements Listener {
 
 	// C4 explosion
 	@SuppressWarnings("deprecation")
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityExplode(EntityExplodeEvent event) {
 		if (!cwu.getConfig().getStatus("destroyableObsidian")) {
 			return;
@@ -173,6 +188,7 @@ public class ObsidDestroyEvents implements Listener {
 		if (!event.getEntity().hasMetadata("C4")) {
 			return;
 		}
+		
 		event.getLocation().getWorld().playSound(event.getLocation(), Sound.EXPLODE, 2.0f, 0.0f);
 		Block block = event.getLocation().getBlock();
 
@@ -195,34 +211,21 @@ public class ObsidDestroyEvents implements Listener {
 					b.setData(newdata);
 					b.getWorld().playSound(b.getLocation(), Sound.ITEM_BREAK, 2.0f, 1.0f);
 				}
+			} else {
+				if (!block.isLiquid()) {
+					continue;
+				}
+				if (b.isLiquid()) {
+					continue;
+				}
+				if (b.getType() == Material.BEDROCK) {
+					continue;
+				}
+				b.breakNaturally();
 			}
 		}
 	}
 	
-	/*
-	@EventHandler
-	public void onBlockFromTo(BlockFromToEvent event) {
-		Block ba1 = event.getBlock().getRelative(event.getFace().DOWN);
-		Block ba2 = event.getBlock().getRelative(event.getFace(), 2);
-		Bukkit.broadcastMessage(ChatColor.GRAY + ba1.getType().name());
-		Bukkit.broadcastMessage(ChatColor.DARK_GRAY + ba2.getType().name());
-		
-		
-		if (event.getBlock().getType() == Material.STATIONARY_WATER || event.getBlock().getType() == Material.WATER) {
-			Bukkit.broadcastMessage(ChatColor.AQUA + event.getToBlock().getType().name());
-			if (event.getToBlock().getType() == Material.STATIONARY_LAVA) {
-				event.getToBlock().setType(Material.DIAMOND_BLOCK);
-			}
-		}
-		
-		if (event.getBlock().getType() == Material.STATIONARY_LAVA || event.getBlock().getType() == Material.LAVA) {
-			Bukkit.broadcastMessage(ChatColor.YELLOW + event.getToBlock().getType().name());
-			if (event.getToBlock().getType() == Material.STATIONARY_WATER) {
-				event.getToBlock().setType(Material.GOLD_BLOCK);
-			}
-		}
-	}
-	*/
 	
 
 	private ItemStack blackPowderItem() {

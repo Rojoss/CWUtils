@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemUtils {
 	
+	@SuppressWarnings("deprecation")
 	public static ItemStack getItem(int ID, int amount, short durability, String name, String[] alore){
 	    ItemStack item = new ItemStack(ID, amount);
 	    return getItem(item, durability, name, alore);

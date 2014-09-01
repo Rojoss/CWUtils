@@ -1,12 +1,9 @@
 package com.clashwars.cwutils.config;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -46,6 +43,11 @@ public class PluginConfig {
 			cfg.setStatus("c4", cu.getBoolean("setEnabled.c4", true));
 			cfg.setStatus("destroyableObsidian", cu.getBoolean("setEnabled.destroyableObsidian", true));
 			cfg.setStatus("duels", cu.getBoolean("setEnabled.duels", false));
+			cfg.setStatus("exp", cu.getBoolean("setEnabled.exp", true));
+			cfg.setStatus("endReset", cu.getBoolean("setEnabled.endReset", true));
+			cfg.setStatus("luck", cu.getBoolean("setEnabled.luck", true));
+			cfg.setStatus("alts", cu.getBoolean("setEnabled.alts", true));
+			cfg.setStatus("createSpawners", cu.getBoolean("setEnabled.createSpawners", true));
 			
 			// Combat logging
 			cfg.setTagTime(cu.getInt("combatLog.tagTime", 30));
