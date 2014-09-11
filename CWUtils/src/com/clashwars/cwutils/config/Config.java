@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.clashwars.cwutils.PlayerBackup;
+import com.clashwars.cwutils.sql.SqlInfo;
 
 
 
@@ -17,10 +18,20 @@ public class Config {
 /* PluginConfig */
 /* ############ */
 	
+	private SqlInfo sqlInfo;
 	private int tagTime;
 	private List<String> blockedCmds;
-	private Map<UUID, List<String>> messages;
 	private Map<String, Boolean> status = new HashMap<String, Boolean>();
+
+	
+	//Sql info
+	public SqlInfo getSqlInfo() {
+		return sqlInfo;
+	}
+
+	public void setSqlInfo(SqlInfo sqlInfo) {
+		this.sqlInfo = sqlInfo;
+	}
 	
 	
 	//Tag time
@@ -39,39 +50,6 @@ public class Config {
 	
 	public List<String> getBlockedCmds() {
 		return blockedCmds;
-	}
-
-	//Queued messages
-	public void setMessages(Map<UUID, List<String>> messages) {
-		this.messages = messages;
-	}
-	
-	public Map<UUID, List<String>> getMessages() {
-		return messages;
-	}
-	
-	public List<String> getMessages(UUID player) {
-		return messages.get(player);
-	}
-	
-	public void addMessage(UUID player, String message) {
-		List<String> list = messages.get(player);
-		if (list != null && !list.contains(message)) {
-			list.add(message);
-			messages.put(player, list);
-		}
-	}
-	
-	public void removeMessage(UUID player, String message) {
-		List<String> list = messages.get(player);
-		if (list.contains(message)) {
-			list.remove(message);
-			if (list.isEmpty()) {
-				messages.remove(player);
-			} else {
-				messages.put(player, list);
-			}
-		}
 	}
 
 	//Enable/Disable certain plugin elements.
@@ -105,10 +83,4 @@ public class Config {
 	public PlayerBackup getBackup(UUID player) {
 		return playerBackups.get(player);
 	}
-	
-	
-	
-	
-	
-
 }

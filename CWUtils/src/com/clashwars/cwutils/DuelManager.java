@@ -78,12 +78,12 @@ public class DuelManager {
 		if (player1.isOnline()) {
 			player1.sendMessage(Utils.integrateColor(message));
 		} else {
-			cwu.getConfig().addMessage(player1.getUniqueId(), message);
+			//cwu.getConfig().addMessage(player1.getUniqueId(), message);
 		}
 		if (player2.isOnline()) {
 			player2.sendMessage(Utils.integrateColor(message));
 		} else {
-			cwu.getConfig().addMessage(player2.getUniqueId(), message);
+			//cwu.getConfig().addMessage(player2.getUniqueId(), message);
 		}
 		duels.remove(player1);
 		player1.closeInventory();

@@ -1,5 +1,7 @@
 package com.clashwars.cwutils.commands;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -188,7 +191,82 @@ public class Commands {
 		}
 		return true;
 	}
+	
+	
+	@Command(permissions = {"cw.queue"}, aliases = { "queue" })
+	public boolean queue(CommandSender sender, String label, String argument, String... args) {
+		if (args.length < 3) {
+			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cInvalid usage. &7/queue {player} {msg|cmd} {content}"));
+			return true;
+		}
+		
+		OfflinePlayer player = null;
+		if (cwu.getServer().getOfflinePlayer(args[0]) == null || !cwu.getServer().getOfflinePlayer(args[0]).hasPlayedBefore()) {
+			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cInvalid player."));
+			return true;
+		}
+		player = cwu.getServer().getOfflinePlayer(args[0]);
+		
+		String type = "msg";
+		if (args[1].toLowerCase().equals("cmd")) {
+			type = "cmd";
+		}
+		
+		String content = "";
+		for (int i = 2; i < args.length; i++) {
+			content = content + args[i] + " ";
+		}
+		
+		cwu.getQM().execute(player, type, content, false);
+		sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &6Queue " + type + " added for &5" + player.getName() + "&6! &8'&7" + content + "&8'"));
+		return true;
+	}
+	
+	
+	
+	@Command(permissions = {}, aliases = { "event" })
+	public boolean event(CommandSender sender, String label, String argument, String... args) {
+		if (args.length < 1) {
+			sender.sendMessage(Utils.integrateColor("&aGetting data from the event server..."));
+			try {
+				ByteArrayOutputStream b = new ByteArrayOutputStream();
+				DataOutputStream out = new DataOutputStream(b);
 
+				out.writeUTF("eventdatarequest");
+				out.writeUTF(sender.getName());
+				out.writeUTF("events");
+				out.writeUTF("pvp");
+				
+				Bukkit.getOnlinePlayers().iterator().next().sendPluginMessage(cwu.getPlugin(), "CWBungee", b.toByteArray());
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+			return true;
+		}
+		if (!args[0].equalsIgnoreCase("join")) {
+			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cUse &4/event join &cto join events. Or &4/event &cfor details."));
+			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cAll your data is saved when joining events! &699.9% safe!"));
+		}
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cPlayer command only."));
+			return true;
+		}
+		sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &6Teleporting to the events server..."));
+		sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &7All your data is saved! Just like leaving the server."));
+		try {
+			ByteArrayOutputStream b = new ByteArrayOutputStream();
+			DataOutputStream out = new DataOutputStream(b);
+
+			out.writeUTF("tpserver");
+			out.writeUTF(((Player)sender).getName());
+			out.writeUTF("events");
+			
+			Bukkit.getOnlinePlayers().iterator().next().sendPluginMessage(cwu.getPlugin(), "CWBungee", b.toByteArray());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
 	
 	
 	

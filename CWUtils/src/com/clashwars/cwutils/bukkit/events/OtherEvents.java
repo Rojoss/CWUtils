@@ -1,5 +1,8 @@
 package com.clashwars.cwutils.bukkit.events;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
@@ -24,6 +27,7 @@ import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -44,6 +48,34 @@ public class OtherEvents implements Listener {
 	
 	public OtherEvents(CWUtils cwu) {
 		this.cwu = cwu;
+	}
+	
+	//Get queued messages and commands on login and execute them
+	@EventHandler
+	public void login(PlayerLoginEvent event) {
+		Player player = event.getPlayer();
+		try {
+			Statement statement = cwu.getSql().createStatement();
+			ResultSet res = statement.executeQuery("SELECT * FROM Queue WHERE UUID='" + player.getUniqueId().toString() + "';");
+			while (res.next()) {
+				if (cwu.getQM().execute(player, res.getString("Type"), res.getString("content"), false)) {
+					try {
+						Statement statement2 = cwu.getSql().createStatement();
+						if (statement2.executeUpdate("DELETE FROM Queue WHERE ID='" + res.getInt("ID") + "';") < 1) {
+							cwu.log("Error deleting queue entry! ID: " + res.getInt("ID") + " Player: " + player.getName() + " UUID: " + player.getUniqueId());
+							return;
+						}
+					} catch (SQLException e) {
+						cwu.log("Error deleting queue entry! ID: " + res.getInt("ID") + " Player: " + player.getName() + " UUID: " + player.getUniqueId());
+						e.printStackTrace();
+						return;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			player.sendMessage(Utils.integrateColor("&8[&4CW&8] &cError connecting to the databse. Can't load queue."));
+			e.printStackTrace();
+		}
 	}
 	
 	//Only allow player entities through portals

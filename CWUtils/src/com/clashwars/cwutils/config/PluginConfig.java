@@ -1,13 +1,10 @@
 package com.clashwars.cwutils.config;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import com.clashwars.cwutils.sql.SqlInfo;
 
 public class PluginConfig {
 	private YamlConfiguration cfgFile;
@@ -35,6 +32,14 @@ public class PluginConfig {
 		try {
 			cfgFile.load(file);
 			
+			//Sql
+			String address = cu.getString("sql.address", "localhost");
+			String port = cu.getString("sql.port", "3306");
+			String user = cu.getString("sql.username", "root");
+			String password = cu.getString("sql.password", "");
+			String database = cu.getString("sql.database", "cwclasses");
+			cfg.setSqlInfo(new SqlInfo(address, port, user, password, database));
+			
 			//Section enabling/disabling
 			cfg.setStatus("tagging", cu.getBoolean("setEnabled.tagging", true));
 			cfg.setStatus("enderchestRecipe", cu.getBoolean("setEnabled.enderchestRecipe", true));
@@ -55,18 +60,6 @@ public class PluginConfig {
 			
 			//Duel
 			
-			
-			
-			//Queued messages
-			Map<UUID, List<String>> messages = new HashMap<UUID, List<String>>();
-			ConfigurationSection cfgSec = cfgFile.getConfigurationSection("queuedMessages");
-			if (cfgSec != null) {
-				for (String playerUUID : cfgSec.getKeys(false)) {
-					 messages.put(UUID.fromString(playerUUID),cu.getStringList("queuedMessages." + playerUUID, new String[] { }));
-				}
-			}
-			cfg.setMessages(messages);
-			
 			cfgFile.save(file);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -75,10 +68,6 @@ public class PluginConfig {
 
 	public void save() {
 		try {
-			cfgFile.set("queuedMessages", null);
-			for (UUID playerUUID : cfg.getMessages().keySet()) {
-				cfgFile.set("queuedMessages." + playerUUID.toString(), cfg.getMessages(playerUUID));
-			}
 			cfgFile.save(file);
 		} catch (Exception e) {
 			e.printStackTrace();

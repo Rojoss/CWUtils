@@ -1,20 +1,26 @@
 package com.clashwars.cwutils;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.messaging.Messenger;
 
 import com.clashwars.cwutils.bukkit.CWUtilsPlugin;
 import com.clashwars.cwutils.bukkit.events.CombatLogEvents;
@@ -22,6 +28,7 @@ import com.clashwars.cwutils.bukkit.events.DuelEvents;
 import com.clashwars.cwutils.bukkit.events.ExpEvents;
 import com.clashwars.cwutils.bukkit.events.FactionEvents;
 import com.clashwars.cwutils.bukkit.events.LuckEvents;
+import com.clashwars.cwutils.bukkit.events.MessageEvents;
 import com.clashwars.cwutils.bukkit.events.ObsidDestroyEvents;
 import com.clashwars.cwutils.bukkit.events.OtherEvents;
 import com.clashwars.cwutils.commands.Commands;
@@ -29,6 +36,8 @@ import com.clashwars.cwutils.config.Config;
 import com.clashwars.cwutils.config.PlayerBackupConfig;
 import com.clashwars.cwutils.config.PluginConfig;
 import com.clashwars.cwutils.runnables.DragonRunnable;
+import com.clashwars.cwutils.sql.MySql;
+import com.clashwars.cwutils.sql.SqlInfo;
 import com.clashwars.cwutils.util.Utils;
 import com.earth2me.essentials.Essentials;
 
@@ -43,17 +52,23 @@ public class CWUtils {
 	private PlayerBackupConfig pbConfig;
 	private Config cfg;
 	
+	private MySql sql = null;
+	private Connection c = null;
+	
 	private Essentials essentials;
 	
 	private Commands cmds;
 	
 	private TagManager tm;
 	private DuelManager dm;
+	private QueueManager qm;
 	
 	public Luck luck;
 	
 	public Set<UUID> spawnerMobs = new HashSet<UUID>();
 	public HashMap<String,HashMap<UUID,Long>> cooldowns = new HashMap<String,HashMap<UUID,Long>>();
+	
+	public final Map<HumanEntity, ItemStack[]> containers = new HashMap<HumanEntity, ItemStack[]>();
 
 	public CWUtils(CWUtilsPlugin cwu) {
 		this.cwu = cwu;
@@ -68,6 +83,12 @@ public class CWUtils {
 		enabled = false;
 		getServer().getScheduler().cancelTasks(this.getPlugin());
 		pluginConfig.save();
+		try {
+			c.close();
+			sql.closeConnection();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		if (cfg.getStatus("endReset")) {
 			deleteEnd();
 		}
@@ -86,7 +107,10 @@ public class CWUtils {
 		cmds.populateCommands();
 		
 		registerEvents();
+		registerChannels();
 		addRecipes();
+		
+		qm = new QueueManager(this);
 		
 		if (cfg.getStatus("alts")) {
 			Plugin essentialsPlugin = getServer().getPluginManager().getPlugin("Essentials");
@@ -110,6 +134,20 @@ public class CWUtils {
 		}
 		
 		new DragonRunnable(this).runTaskTimer(this.getPlugin(), 0, 20);
+		
+		SqlInfo sqli = cfg.getSqlInfo();
+		sql = new MySql(this, sqli.getAddress(), sqli.getPort(), sqli.getDb(), sqli.getUser(), sqli.getPass());
+		if (sql == null) {
+			log("Can't conntact to database!");
+			getPlugin().getPluginLoader().disablePlugin(getPlugin());
+			return;
+		}
+		c = sql.openConnection();
+		if (c == null) {
+			log("Can't conntact to database!");
+			getPlugin().getPluginLoader().disablePlugin(getPlugin());
+			return;
+		}
 		
 		enabled = true;
 		log("Enabled.");
@@ -135,6 +173,13 @@ public class CWUtils {
 		if (cfg.getStatus("luck")) {
 			pm.registerEvents(new LuckEvents(this), getPlugin());
 		}
+	}
+	
+	private void registerChannels() {
+		Messenger msg = getPlugin().getServer().getMessenger();
+
+		msg.registerIncomingPluginChannel(getPlugin(), "CWBungee", new MessageEvents(this));
+		msg.registerOutgoingPluginChannel(getPlugin(), "CWBungee");
 	}
 	
 	private void addRecipes() {
@@ -199,6 +244,17 @@ public class CWUtils {
 		return pbConfig;
 	}
 	
+	public Connection getSql() {
+		try {
+			if (c == null || c.isClosed()) {
+				c = sql.openConnection();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return c;
+	}
+	
 	public TagManager getTM() {
 		return tm;
 	}
@@ -210,8 +266,34 @@ public class CWUtils {
 	public Essentials getEssentials() {
 		return essentials;
 	}
+	
+	public QueueManager getQM() {
+		return qm;
+	}
 
 	public static CWUtils getInstance() {
 		return instance;
+	}
+
+	public void sendEventInfo(String senderStr, String event, String arena, int players, int slots, String status) {
+		CommandSender sender = null;
+		OfflinePlayer player = getServer().getOfflinePlayer(senderStr);
+		if (player != null && player.isOnline()) {
+			sender = (CommandSender)player;
+		} else if (senderStr.equalsIgnoreCase("console")) {
+			sender = getServer().getConsoleSender();
+		}
+		if (sender != null) {
+			sender.sendMessage(Utils.integrateColor("&8======== &4&lEvent Information &8========"));
+			if (event.equalsIgnoreCase("none") || arena.equalsIgnoreCase("none")) {
+				sender.sendMessage(Utils.integrateColor("&cThere is currently no event active."));
+			} else {
+				sender.sendMessage(Utils.integrateColor("&6Event&8: &5" + event));
+				sender.sendMessage(Utils.integrateColor("&6Arena&8: &5" + arena));
+				sender.sendMessage(Utils.integrateColor("&6Slots&8: &a" + players + "&7/&2" + slots));
+				sender.sendMessage(Utils.integrateColor("&6Status&8: &5" + status));
+				sender.sendMessage(Utils.integrateColor("&7Use &9/event join &7to join the events server!"));
+			}
+		}
 	}
 }

@@ -12,7 +12,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.projectiles.ProjectileSource;
@@ -82,8 +81,8 @@ public class CombatLogEvents implements Listener {
 		
 		if (cwu.getTM().isTagged(player)) {
 			player.setHealth(0);
-			cwu.getConfig().addMessage(player.getUniqueId(), "&8[&4CW Tag&8] &c&lYou where killed for combat logging!");
-			cwu.getConfig().addMessage(player.getUniqueId(), "&8[&4CW Tag&8] &4" + cwu.getTM().getTagger(player) + " &chad tagged you!");
+			cwu.getQM().execute(player, "msg", "&8[&4CW Tag&8] &c&lYou where killed for combat logging!", true);
+			cwu.getQM().execute(player, "msg", "&8[&4CW Tag&8] &4" + cwu.getTM().getTagger(player) + " &chad tagged you!", true);
 			Bukkit.broadcastMessage(Utils.integrateColor("&8[&4CW Tag&8] &9&l" + player.getName() + " &3combat logged!"));
 			cwu.getTM().removeTag(player);
 		}
@@ -96,20 +95,6 @@ public class CombatLogEvents implements Listener {
 		}
 		
 		cwu.getTM().removeTag(event.getPlayer());
-	}
-	
-	
-	//Used to send queued messages like for combat logging.
-	@EventHandler
-	public void onJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		List<String> messages = cwu.getConfig().getMessages(player.getUniqueId());
-		if (messages != null) {
-			for (String msg : messages) {
-				player.sendMessage(Utils.integrateColor(msg));
-				cwu.getConfig().removeMessage(player.getUniqueId(), msg);
-			}
-		}
 	}
 	
 	
