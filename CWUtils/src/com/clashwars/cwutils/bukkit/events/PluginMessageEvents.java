@@ -10,11 +10,11 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import com.clashwars.cwutils.CWUtils;
 
-public class MessageEvents implements PluginMessageListener {
+public class PluginMessageEvents implements PluginMessageListener {
 
 	private CWUtils cwu;
 	
-	public MessageEvents(CWUtils cwu) {
+	public PluginMessageEvents(CWUtils cwu) {
 		this.cwu = cwu;
 	}
 	

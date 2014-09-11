@@ -28,7 +28,7 @@ import com.clashwars.cwutils.bukkit.events.DuelEvents;
 import com.clashwars.cwutils.bukkit.events.ExpEvents;
 import com.clashwars.cwutils.bukkit.events.FactionEvents;
 import com.clashwars.cwutils.bukkit.events.LuckEvents;
-import com.clashwars.cwutils.bukkit.events.MessageEvents;
+import com.clashwars.cwutils.bukkit.events.PluginMessageEvents;
 import com.clashwars.cwutils.bukkit.events.ObsidDestroyEvents;
 import com.clashwars.cwutils.bukkit.events.OtherEvents;
 import com.clashwars.cwutils.commands.Commands;
@@ -178,7 +178,7 @@ public class CWUtils {
 	private void registerChannels() {
 		Messenger msg = getPlugin().getServer().getMessenger();
 
-		msg.registerIncomingPluginChannel(getPlugin(), "CWBungee", new MessageEvents(this));
+		msg.registerIncomingPluginChannel(getPlugin(), "CWBungee", new PluginMessageEvents(this));
 		msg.registerOutgoingPluginChannel(getPlugin(), "CWBungee");
 	}
 	
