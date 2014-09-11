@@ -52,30 +52,34 @@ public class OtherEvents implements Listener {
 	
 	//Get queued messages and commands on login and execute them
 	@EventHandler
-	public void login(PlayerLoginEvent event) {
-		Player player = event.getPlayer();
-		try {
-			Statement statement = cwu.getSql().createStatement();
-			ResultSet res = statement.executeQuery("SELECT * FROM Queue WHERE UUID='" + player.getUniqueId().toString() + "';");
-			while (res.next()) {
-				if (cwu.getQM().execute(player, res.getString("Type"), res.getString("content"), false)) {
-					try {
-						Statement statement2 = cwu.getSql().createStatement();
-						if (statement2.executeUpdate("DELETE FROM Queue WHERE ID='" + res.getInt("ID") + "';") < 1) {
-							cwu.log("Error deleting queue entry! ID: " + res.getInt("ID") + " Player: " + player.getName() + " UUID: " + player.getUniqueId());
-							return;
+	public void login(final PlayerLoginEvent event) {
+		cwu.getServer().getScheduler().scheduleSyncDelayedTask(cwu.getPlugin(), new Runnable() {
+		    public void run() {
+				Player player = event.getPlayer();
+				try {
+					Statement statement = cwu.getSql().createStatement();
+					ResultSet res = statement.executeQuery("SELECT * FROM Queue WHERE UUID='" + player.getUniqueId().toString() + "';");
+					while (res.next()) {
+						if (cwu.getQM().execute(player, res.getString("Type"), res.getString("content"), false)) {
+							try {
+								Statement statement2 = cwu.getSql().createStatement();
+								if (statement2.executeUpdate("DELETE FROM Queue WHERE ID='" + res.getInt("ID") + "';") < 1) {
+									cwu.log("Error deleting queue entry! ID: " + res.getInt("ID") + " Player: " + player.getName() + " UUID: " + player.getUniqueId());
+									return;
+								}
+							} catch (SQLException e) {
+								cwu.log("Error deleting queue entry! ID: " + res.getInt("ID") + " Player: " + player.getName() + " UUID: " + player.getUniqueId());
+								e.printStackTrace();
+								return;
+							}
 						}
-					} catch (SQLException e) {
-						cwu.log("Error deleting queue entry! ID: " + res.getInt("ID") + " Player: " + player.getName() + " UUID: " + player.getUniqueId());
-						e.printStackTrace();
-						return;
 					}
+				} catch (SQLException e) {
+					player.sendMessage(Utils.integrateColor("&8[&4CW&8] &cError connecting to the databse. Can't load queue."));
+					e.printStackTrace();
 				}
-			}
-		} catch (SQLException e) {
-			player.sendMessage(Utils.integrateColor("&8[&4CW&8] &cError connecting to the databse. Can't load queue."));
-			e.printStackTrace();
-		}
+		    }
+		}, 20L);
 	}
 	
 	//Only allow player entities through portals

@@ -30,7 +30,7 @@ public class QueueManager {
 			content = content.replace("{PLAYER}", player.getName());
 			content = content.replace("{DISPLAYNAME}", ((Player) player).getDisplayName());
 			
-			if (type == "cmd") {
+			if (type.equalsIgnoreCase("cmd")) {
 				cwu.getServer().dispatchCommand(cwu.getServer().getConsoleSender(), content);
 			} else {
 				((Player)player).sendMessage(Utils.integrateColor(content));
