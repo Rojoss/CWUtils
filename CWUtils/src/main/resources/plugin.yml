@@ -1,0 +1,14 @@
+main : com.clashwars.cwutils.CWUtils
+name: ${project.artifactId}
+version: ${project.version}
+description: ${project.description}
+softdepend: [Factions, Essentials]
+commands:
+    reward:
+        description: Give a random reward.
+    alts:
+        description: Check alts.
+    queue:
+        description: Add queue msg/cmd
+    event:
+        description: Event data and join events.
