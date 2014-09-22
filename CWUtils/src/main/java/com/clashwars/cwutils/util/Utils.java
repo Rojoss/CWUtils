@@ -24,6 +24,13 @@ import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 public class Utils {
+
+    private static Random random;
+
+    static {
+        random = new Random();
+    }
+
 	//Integrate colors in a string
 	public static String integrateColor(String str) {
 		for (ChatColor c : ChatColor.values()) {
@@ -90,7 +97,7 @@ public class Utils {
         }
         return(path.delete());
 	}
-	
+
 	public static boolean canbuildInRegion (Player player) {
 		ApplicableRegionSet set = WGBukkit.getRegionManager(player.getWorld()).getApplicableRegions(player.getLocation());
 		LocalPlayer localPlayer = WGBukkit.getPlugin().wrapPlayer(player);
@@ -100,6 +107,10 @@ public class Utils {
 	public static int random(Random random, int start, int end) {
 		return start + random.nextInt(end - start + 1);
 	}
+
+    public static int random(int start, int end) {
+        return start + random.nextInt(end - start + 1);
+    }
 	
 	public static void shootAt(org.bukkit.entity.LivingEntity entity, org.bukkit.entity.EntityType type, Location loc, float force) {
 		EntityLiving target = ((CraftLivingEntity) entity).getHandle();

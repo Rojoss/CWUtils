@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import com.clashwars.cwutils.config.TipConfig;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -50,6 +51,7 @@ public class CWUtils extends JavaPlugin {
 	private PluginConfig pluginConfig;
 	private PlayerBackupConfig pbConfig;
 	private Config cfg;
+    private TipConfig tipCfg;
 	
 	private MySql sql = null;
 	private Connection c = null;
@@ -97,6 +99,9 @@ public class CWUtils extends JavaPlugin {
 		pluginConfig = new PluginConfig(cfg);
 		pluginConfig.init();
 		pluginConfig.load();
+
+        tipCfg = new TipConfig("plugins/CWUtils/tips.yml");
+        tipCfg.load();
 		
 		cmds = new Commands(this);
 		cmds.populateCommands();
@@ -230,6 +235,10 @@ public class CWUtils extends JavaPlugin {
 	public PlayerBackupConfig getPBConfig() {
 		return pbConfig;
 	}
+
+    public TipConfig getTipCfg() {
+        return tipCfg;
+    }
 	
 	public Connection getSql() {
 		try {

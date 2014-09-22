@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.clashwars.cwutils.config.internal.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.clashwars.cwutils.PlayerBackup;

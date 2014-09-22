@@ -2,6 +2,7 @@ package com.clashwars.cwutils.config;
 
 import java.io.File;
 
+import com.clashwars.cwutils.config.internal.ConfigUtil;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.clashwars.cwutils.sql.SqlInfo;
@@ -52,7 +53,8 @@ public class PluginConfig {
 			cfg.setStatus("endReset", cu.getBoolean("setEnabled.endReset", true));
 			cfg.setStatus("luck", cu.getBoolean("setEnabled.luck", true));
 			cfg.setStatus("alts", cu.getBoolean("setEnabled.alts", true));
-			cfg.setStatus("createSpawners", cu.getBoolean("setEnabled.createSpawners", true));
+            cfg.setStatus("createSpawners", cu.getBoolean("setEnabled.createSpawners", true));
+            cfg.setStatus("tipOnLogin", cu.getBoolean("setEnabled.tipOnLogin", true));
 			
 			// Combat logging
 			cfg.setTagTime(cu.getInt("combatLog.tagTime", 30));

@@ -1,4 +1,4 @@
-package com.clashwars.cwutils.config;
+package com.clashwars.cwutils.config.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -50,12 +50,19 @@ public class OtherEvents implements Listener {
 		this.cwu = cwu;
 	}
 	
-	//Get queued messages and commands on login and execute them
+	//Get queued messages and commands on login and execute them and send tip.
 	@EventHandler
 	public void login(final PlayerLoginEvent event) {
 		cwu.getServer().getScheduler().scheduleSyncDelayedTask(cwu, new Runnable() {
 		    public void run() {
 				Player player = event.getPlayer();
+                //Tip
+                String tip = cwu.getTipCfg().getRandomTip();
+                if (tip != null) {
+                    player.sendMessage(Utils.integrateColor("&a&lTIP&8&l: &8❝&7" + cwu.getTipCfg().getRandomTip() + "&8❞"));
+                }
+
+                //Queue
 				try {
 					Statement statement = cwu.getSql().createStatement();
 					ResultSet res = statement.executeQuery("SELECT * FROM Queue WHERE UUID='" + player.getUniqueId().toString() + "';");
