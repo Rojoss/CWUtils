@@ -72,21 +72,23 @@ public class LuckEvents implements Listener {
 		//Mine spawner : Get spawner.
 		if (block.getType() == Material.MOB_SPAWNER) {
 			if (cwu.luck.checkChance(player, 0.005f, 0.1f)) {
-				CreatureSpawner spawner = (CreatureSpawner) block.getState();
-				switch (spawner.getSpawnedType()) {
-					case ZOMBIE:
-					case SKELETON:
-					case CAVE_SPIDER:
-					case SPIDER:
-					case PIG:
-						player.getWorld().playSound(block.getLocation(), Sound.LEVEL_UP, 2.0f, 2.0f);
-						ParticleEffect.FLAME.display(block.getLocation().add(0.5f, 0, 0.5f), 0.5f, 0.5f, 0.5f, 0.001f, 100);
-						player.getWorld().dropItemNaturally(block.getLocation(), cwu.getSpawnerItem(spawner.getSpawnedType().toString().toLowerCase().replace("_", "")));
-						player.sendMessage(Utils.integrateColor(prefix + "You got extremely lucky and got the spawner!!!!"));
-						break;
-					default:
-						break;
-				}
+                if (!block.hasMetadata("CustomSpawner")) {
+                    CreatureSpawner spawner = (CreatureSpawner) block.getState();
+                    switch (spawner.getSpawnedType()) {
+                        case ZOMBIE:
+                        case SKELETON:
+                        case CAVE_SPIDER:
+                        case SPIDER:
+                        case PIG:
+                            player.getWorld().playSound(block.getLocation(), Sound.LEVEL_UP, 2.0f, 2.0f);
+                            ParticleEffect.FLAME.display(block.getLocation().add(0.5f, 0, 0.5f), 0.5f, 0.5f, 0.5f, 0.001f, 100);
+                            player.getWorld().dropItemNaturally(block.getLocation(), cwu.getSpawnerItem(spawner.getSpawnedType().toString().toLowerCase().replace("_", "")));
+                            player.sendMessage(Utils.integrateColor(prefix + "You got extremely lucky and got the spawner!!!!"));
+                            break;
+                        default:
+                            break;
+                    }
+                }
 			}
 			return;
 		}
