@@ -267,7 +267,21 @@ public class Commands {
 		}
 		return true;
 	}
-	
+
+
+
+    @Command(permissions = {}, aliases = { "vote" })
+    public boolean vote(CommandSender sender, String label, String argument, String... args) {
+        sender.sendMessage(Utils.integrateColor("&8======== &4&lVoting Sites &8========"));
+        sender.sendMessage(Utils.integrateColor("&7&oYou can vote every day on the sites below."));
+        sender.sendMessage(Utils.integrateColor("&7&oYou will get a random reward for every site you vote on."));
+        sender.sendMessage(Utils.integrateColor("&6&lMain voting page&8&l:&9 http://clashwars.com/vote"));
+        sender.sendMessage(Utils.integrateColor("&8★ &6Site 1 (PMC)&8:&9 http://goo.gl/Vmkp7q"));
+        sender.sendMessage(Utils.integrateColor("&7&oplease also &4&ofavorite❤ &7&oand give a &b&odiamond✦ &7&oon pmc. &9:&c)"));
+        sender.sendMessage(Utils.integrateColor("&8★ &6Site 2 (MS)&8:&9 http://goo.gl/ddmZv1"));
+        sender.sendMessage(Utils.integrateColor("&8★ &6Site 3 (MCSL)&8:&9 http://goo.gl/30re1M"));
+        return true;
+    }
 	
 	
 	/* End of commands */

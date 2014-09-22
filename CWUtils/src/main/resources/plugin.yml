@@ -12,3 +12,5 @@ commands:
         description: Add queue msg/cmd
     event:
         description: Event data and join events.
+    vote:
+        description: See voting information and links.
