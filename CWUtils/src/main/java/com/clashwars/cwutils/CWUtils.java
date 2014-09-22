@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import com.clashwars.cwutils.config.TipConfig;
+import com.clashwars.cwutils.util.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -193,18 +194,30 @@ public class CWUtils extends JavaPlugin {
 			echest.setIngredient('#', Material.OBSIDIAN);
 			getServer().addRecipe(echest);
 		}
-		//Custom Spawnwer recipe.
+		//Custom Spawnwer recipes.
 		if (cfg.getStatus("createSpawners")) {
-			ShapedRecipe spawner = new ShapedRecipe(new ItemStack(Material.MOB_SPAWNER, 1));
-			spawner.shape("^*^", "^@^", "###");
-			spawner.setIngredient('^', Material.DRAGON_EGG);
-			spawner.setIngredient('*', Material.NETHER_STAR);
-            //TODO: Test if this works else need to do stuff on craft event to check mob egg type.
-			spawner.setIngredient('@', Material.MONSTER_EGG, 50);
-			spawner.setIngredient('#', Material.OBSIDIAN);
-			getServer().addRecipe(spawner);
+            addSpawnerRecipe(50, "Creeper");
+            addSpawnerRecipe(51, "Skeleton");
+            addSpawnerRecipe(52, "Spider");
+            addSpawnerRecipe(59, "CaveSpider");
+            addSpawnerRecipe(54, "Zombie");
+            addSpawnerRecipe(58, "Enderman");
+            addSpawnerRecipe(90, "Pig");
+            addSpawnerRecipe(92, "Cow");
+            addSpawnerRecipe(91, "Sheep");
+            addSpawnerRecipe(93, "Chicken");
 		}
 	}
+
+    private void addSpawnerRecipe(int eggID, String entityName) {
+        ShapedRecipe spawner = new ShapedRecipe(getSpawnerItem(entityName));
+        spawner.shape("^*^", "^@^", "###");
+        spawner.setIngredient('^', Material.DRAGON_EGG);
+        spawner.setIngredient('*', Material.NETHER_STAR);
+        spawner.setIngredient('@', Material.MONSTER_EGG, eggID);
+        spawner.setIngredient('#', Material.OBSIDIAN);
+        getServer().addRecipe(spawner);
+    }
 	
 	private void deleteEnd() {
 		World end = getServer().getWorld("world_the_end");
@@ -271,6 +284,12 @@ public class CWUtils extends JavaPlugin {
 	public static CWUtils getInstance() {
 		return instance;
 	}
+
+    public ItemStack getSpawnerItem(String entityName) {
+        return ItemUtils.getItem(Material.MOB_SPAWNER, 1, (short)0, "&5&l" + entityName + " &6&lSpawner!", new String[] {
+                "&e&l" + entityName, "&7When placed it will spawn &8" + entityName, "&7You can break and move the spawner for a limited time.", "&cWhen the server restarts you &4can't move &cit anymore!",
+                "&7You also can't ask the staff to move the spawner.", "&7So make sure you place it in the right place!", "&7Till a restart you can pick it back up with any pickaxe."});
+    }
 
 	public void sendEventInfo(String senderStr, String event, String arena, int players, int slots, String status) {
 		CommandSender sender = null;

@@ -4,13 +4,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
@@ -20,6 +24,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -32,6 +38,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -357,4 +364,47 @@ public class OtherEvents implements Listener {
 			}, 12L);
 	    }
 	}
+
+    //Place custom spawner and set the mob type.
+    @EventHandler
+    public void Place(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = player.getItemInHand();
+        if (item.getType() != Material.MOB_SPAWNER) {
+            return;
+        }
+        if (item.hasItemMeta()) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta.hasDisplayName() && Utils.stripAllColour(meta.getDisplayName()).contains("Spawner!")) {
+                List<String> lore = meta.getLore();
+                if (lore.size() > 0) {
+                    BlockState state = event.getBlockPlaced().getState();
+                    if (state instanceof CreatureSpawner) {
+                        CreatureSpawner spawner = (CreatureSpawner) state;
+                        spawner.setCreatureTypeByName(Utils.stripAllColour(lore.get(0)));
+                        event.getBlockPlaced().setMetadata("CustomSpawner", new FixedMetadataValue(cwu, Utils.stripAllColour(lore.get(0))));
+                        player.sendMessage(Utils.integrateColor("&8[&4CW&8] &5" + Utils.stripAllColour(lore.get(0)) + " &6spawner placed!"));
+                        ;					}
+                }
+            }
+        }
+    }
+
+    //Break a custom spawner and give item back.
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+        World world = block.getWorld();
+
+        if (block.getType().equals(Material.MOB_SPAWNER)) {
+            if (block.hasMetadata("CustomSpawner")) {
+                event.setCancelled(true);
+                event.getBlock().setType(Material.AIR);
+                world.dropItemNaturally(event.getBlock().getLocation(), cwu.getSpawnerItem(event.getBlock().getMetadata("CustomSpawner").get(0).asString()));
+                event.getBlock().removeMetadata("CustomSpawner", cwu);
+            }
+            return;
+        }
+        return;
+    }
 }

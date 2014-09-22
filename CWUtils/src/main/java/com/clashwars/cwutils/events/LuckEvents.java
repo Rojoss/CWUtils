@@ -6,6 +6,7 @@ import java.util.Random;
 import org.bukkit.CropState;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
@@ -29,6 +30,7 @@ import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Crops;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -79,9 +81,7 @@ public class LuckEvents implements Listener {
 					case PIG:
 						player.getWorld().playSound(block.getLocation(), Sound.LEVEL_UP, 2.0f, 2.0f);
 						ParticleEffect.FLAME.display(block.getLocation().add(0.5f, 0, 0.5f), 0.5f, 0.5f, 0.5f, 0.001f, 100);
-						player.getWorld().dropItemNaturally(block.getLocation(), ItemUtils.getItem(Material.MOB_SPAWNER, 1, (short)0, "&6&lMob Spawner!", 
-								new String[] {"&e" + spawner.getCreatureTypeName(), "&7This is a special spawner.", "&7You can place it anywhere.", 
-							"&7And you will get the same spawner as you mined.", "&4WARNING: &cBreaking it again will destroy it!", "&cWe do not move spawners."}));
+						player.getWorld().dropItemNaturally(block.getLocation(), cwu.getSpawnerItem(spawner.getSpawnedType().toString().toLowerCase().replace("_", "")));
 						player.sendMessage(Utils.integrateColor(prefix + "You got extremely lucky and got the spawner!!!!"));
 						break;
 					default:
@@ -141,32 +141,8 @@ public class LuckEvents implements Listener {
 			}
 		}
 	}
-	
-	
-	@EventHandler
-	public void Place(BlockPlaceEvent event) {
-		Player player = event.getPlayer();
-		ItemStack item = player.getItemInHand();
-		if (item.getType() != Material.MOB_SPAWNER) {
-			return;
-		}
-		if (item.hasItemMeta()) {
-			ItemMeta meta = item.getItemMeta();
-			if (Utils.stripAllColour(meta.getDisplayName()).equals("Mob Spawner!")) {
-				List<String> lore = meta.getLore();
-				if (lore.size() > 0) {
-					BlockState state = event.getBlockPlaced().getState();
-					if (state instanceof CreatureSpawner) {
-						CreatureSpawner spawner = (CreatureSpawner) state;
-						spawner.setCreatureTypeByName(Utils.stripAllColour(lore.get(0)));
-						player.sendMessage(Utils.integrateColor("&8[&4CW&8] &5" + Utils.stripAllColour(lore.get(0)) + " &6spawner placed!"));
-;					}
-				}
-			}
-		}
-	}
-	
-	
+
+
 	@EventHandler
 	public void Interact(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
