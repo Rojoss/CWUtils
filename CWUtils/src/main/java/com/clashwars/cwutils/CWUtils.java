@@ -199,7 +199,8 @@ public class CWUtils extends JavaPlugin {
 			spawner.shape("^*^", "^@^", "###");
 			spawner.setIngredient('^', Material.DRAGON_EGG);
 			spawner.setIngredient('*', Material.NETHER_STAR);
-			spawner.setIngredient('@', Material.MONSTER_EGG);
+            //TODO: Test if this works else need to do stuff on craft event to check mob egg type.
+			spawner.setIngredient('@', Material.MONSTER_EGG, 50);
 			spawner.setIngredient('#', Material.OBSIDIAN);
 			getServer().addRecipe(spawner);
 		}
