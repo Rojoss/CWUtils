@@ -239,13 +239,15 @@ public class Commands {
 				
 				Bukkit.getOnlinePlayers().iterator().next().sendPluginMessage(cwu, "CWBungee", b.toByteArray());
 			} catch (Throwable e) {
-				e.printStackTrace();
+                sender.sendMessage(Utils.integrateColor("&cFailed at sending a data request."));
+                e.printStackTrace();
 			}
 			return true;
 		}
 		if (!args[0].equalsIgnoreCase("join")) {
 			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cUse &4/event join &cto join events. Or &4/event &cfor details."));
 			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cAll your data is saved when joining events! &699.9% safe!"));
+            return true;
 		}
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cPlayer command only."));
