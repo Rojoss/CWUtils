@@ -11,10 +11,7 @@ import java.util.logging.Logger;
 
 import com.clashwars.cwutils.config.TipConfig;
 import com.clashwars.cwutils.util.ItemUtils;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
@@ -69,6 +66,8 @@ public class CWUtils extends JavaPlugin {
 	
 	public Set<UUID> spawnerMobs = new HashSet<UUID>();
 	public HashMap<String,HashMap<UUID,Long>> cooldowns = new HashMap<String,HashMap<UUID,Long>>();
+
+    public Set<String> eventDataRequests = new HashSet<String>();
 	
 	public final Map<HumanEntity, ItemStack[]> containers = new HashMap<HumanEntity, ItemStack[]>();
 
@@ -291,8 +290,8 @@ public class CWUtils extends JavaPlugin {
                 "&7You also can't ask the staff to move the spawner.", "&7So make sure you place it in the right place!", "&7Till a restart you can pick it back up with any pickaxe."});
     }
 
-	public void sendEventInfo(String senderStr, String event, String arena, int players, int slots, String status) {
-		CommandSender sender = null;
+	public void sendEventInfo(String senderStr, String event, String arena, String players, String slots, String status) {
+        CommandSender sender = null;
 		OfflinePlayer player = getServer().getOfflinePlayer(senderStr);
 		if (player != null && player.isOnline()) {
 			sender = (CommandSender)player;
@@ -300,6 +299,9 @@ public class CWUtils extends JavaPlugin {
 			sender = getServer().getConsoleSender();
 		}
 		if (sender != null) {
+            if (eventDataRequests.contains(sender.getName())) {
+                eventDataRequests.remove(sender.getName());
+            }
 			sender.sendMessage(Utils.integrateColor("&8======== &4&lEvent Information &8========"));
 			if (event.equalsIgnoreCase("none") || arena.equalsIgnoreCase("none")) {
 				sender.sendMessage(Utils.integrateColor("&cThere is currently no event active."));

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -24,8 +25,8 @@ public class PluginMessageEvents implements PluginMessageListener {
 		if (!channel.equalsIgnoreCase("CWBungee")) {
 			return;
 		}
-		
-		final DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+
+        final DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
 
 		cwu.getServer().getScheduler().runTaskLater(cwu, new Runnable() {
 			@Override
@@ -35,9 +36,8 @@ public class PluginMessageEvents implements PluginMessageListener {
                     String s = ch.toLowerCase();
                     if (s.equals("queue")) {
                         cwu.getQM().execute(UUID.fromString(in.readUTF()), in.readUTF(), in.readUTF(), false);
-
                     } else if (s.equals("eventdata")) {// sender | event | arena | players | slots | status
-                        cwu.sendEventInfo(in.readUTF(), in.readUTF(), in.readUTF(), in.readInt(), in.readInt(), in.readUTF());
+                        cwu.sendEventInfo(in.readUTF(), in.readUTF(), in.readUTF(), in.readUTF(), in.readUTF(), in.readUTF());
 
                     }
 				} catch (Throwable e) {

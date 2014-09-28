@@ -225,9 +225,14 @@ public class Commands {
 	
 	
 	@Command(permissions = {}, aliases = { "event" })
-	public boolean event(CommandSender sender, String label, String argument, String... args) {
+	public boolean event(final CommandSender sender, String label, String argument, String... args) {
 		if (args.length < 1) {
-			sender.sendMessage(Utils.integrateColor("&aGetting data from the event server..."));
+            if (cwu.eventDataRequests.contains(sender.getName())) {
+                sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cAlready loading event data... Please wait."));
+                return true;
+            }
+            sender.sendMessage(Utils.integrateColor("&aGetting data from the event server..."));
+            cwu.eventDataRequests.add(sender.getName());
 			try {
 				ByteArrayOutputStream b = new ByteArrayOutputStream();
 				DataOutputStream out = new DataOutputStream(b);
@@ -242,6 +247,15 @@ public class Commands {
                 sender.sendMessage(Utils.integrateColor("&cFailed at sending a data request."));
                 e.printStackTrace();
 			}
+            cwu.getServer().getScheduler().scheduleSyncDelayedTask(cwu, new Runnable() {
+                public void run() {
+                    if (cwu.eventDataRequests.contains(sender.getName())) {
+                        sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cNo data received from the events server."));
+                        sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cThe server might be &4down &cor &4empty &cright now."));
+                        cwu.eventDataRequests.remove(sender.getName());
+                    }
+                }
+            }, 40L);
 			return true;
 		}
 		if (!args[0].equalsIgnoreCase("join")) {
