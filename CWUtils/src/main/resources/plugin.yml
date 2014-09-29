@@ -6,6 +6,8 @@ softdepend: [Factions, Essentials]
 commands:
     reward:
         description: Give a random reward.
+    eventreward:
+        description: Give a random reward for winning a event.
     alts:
         description: Check alts.
     queue:

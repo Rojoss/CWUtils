@@ -153,6 +153,129 @@ public class Commands {
 		}
 		return true;
 	}
+
+
+    @Command(permissions = {}, aliases = { "eventreward" })
+    public boolean eventreward(CommandSender sender, String label, String argument, String... args) {
+        if (args.length < 1) {
+            sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cInvalid usage. &7/eventreward <player>"));
+            return true;
+        }
+
+        if (!sender.hasPermission("cw.eventreward") && !sender.isOp()) {
+            sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cInsufficient permissions."));
+            return true;
+        }
+
+        @SuppressWarnings("deprecation")
+        Player player = cwu.getServer().getPlayer(args[0]);
+        if (player == null) {
+            sender.sendMessage(Utils.integrateColor("&8[&4CW&8] &cInvalid player."));
+            return true;
+        }
+
+        List<String> rewardsGiven = new ArrayList<String>();
+
+        while (rewardsGiven.size() < 1) {
+            //Coins
+            float chance = random.nextFloat();
+            if (chance <= 0.20f) {
+                cwu.getServer().dispatchCommand(cwu.getServer().getConsoleSender(), "eco give " + player.getName() + " 250");
+                rewardsGiven.add("250 Coins");
+            }
+
+            //XP
+            chance = random.nextFloat();
+            if (chance <= 0.20f) {
+                ExpUtils xpu = new ExpUtils(player);
+                xpu.setExp(xpu.getCurrentExp() + 128);
+                rewardsGiven.add("128 XP");
+            }
+
+            //Diamonds
+            chance = random.nextFloat();
+            if (chance <= 0.06f) {
+                int amount = 1;
+                chance = random.nextFloat();
+                if (chance < 0.3f) {
+                    amount = 2;
+                }
+
+                if (player.getInventory().firstEmpty() >= 0) {
+                    player.getInventory().addItem(new ItemStack(Material.DIAMOND, amount));
+                } else {
+                    player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.DIAMOND, amount));
+                }
+                rewardsGiven.add("" + amount + " Diamond");
+            }
+
+            //TnT
+            chance = random.nextFloat();
+            if (chance <= 0.15f) {
+                int amount = 2;
+                chance = random.nextFloat();
+                if (chance < 0.05f) {
+                    amount = 8;
+                } else if (chance < 0.5f) {
+                    amount = 4;
+                }
+
+                if (player.getInventory().firstEmpty() >= 0) {
+                    player.getInventory().addItem(new ItemStack(Material.TNT, amount));
+                } else {
+                    player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.TNT, amount));
+                }
+                rewardsGiven.add("" + amount + " TnT");
+            }
+
+            //Emeralds
+            chance = random.nextFloat();
+            if (chance <= 0.25f) {
+                int amount = 2;
+                chance = random.nextFloat();
+                if (chance < 0.05f) {
+                    amount = 8;
+                } else if (chance < 0.5f) {
+                    amount = 4;
+                }
+
+                if (player.getInventory().firstEmpty() >= 0) {
+                    player.getInventory().addItem(new ItemStack(Material.EMERALD, amount));
+                } else {
+                    player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.EMERALD, amount));
+                }
+                rewardsGiven.add("" + amount + " Emeralds");
+            }
+
+            //Class exp
+            chance = random.nextFloat();
+            if (chance <= 0.25f) {
+                int amount = 100;
+                chance = random.nextFloat();
+                if (chance < 0.05f) {
+                    amount = 300;
+                } else if (chance < 0.5f) {
+                    amount = 200;
+                }
+
+                String classs = "Guardian";
+                chance = random.nextFloat();
+                if (chance <= 0.25f) {
+                    classs = "Warrior";
+                } else if (chance < 0.5f) {
+                    classs = "Archer";
+                } else if (chance < 0.75f) {
+                    classs = "Rogue";
+                }
+
+                cwu.getServer().dispatchCommand(cwu.getServer().getConsoleSender(), "classes givexp " + amount + " " + player.getName() + " " + classs);
+                rewardsGiven.add("" + amount + " " + classs + " xp");
+            }
+        }
+
+        player.sendMessage(Utils.integrateColor("&8[&4CW&8] &6You received the following rewards for winning a event&7: &5" + StringUtils.join(rewardsGiven, "&7, &5")));
+        return true;
+    }
 	
 	
 	@SuppressWarnings("deprecation")

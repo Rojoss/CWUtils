@@ -35,7 +35,10 @@ public class PluginMessageEvents implements PluginMessageListener {
 					String ch = in.readUTF();
                     String s = ch.toLowerCase();
                     if (s.equals("queue")) {
-                        cwu.getQM().execute(UUID.fromString(in.readUTF()), in.readUTF(), in.readUTF(), false);
+                        String uuid = in.readUTF().toString();
+                        String type = in.readUTF();
+                        String content = in.readUTF();
+                        cwu.getQM().execute(UUID.fromString(uuid), type, content, false);
                     } else if (s.equals("eventdata")) {// sender | event | arena | players | slots | status
                         cwu.sendEventInfo(in.readUTF(), in.readUTF(), in.readUTF(), in.readUTF(), in.readUTF(), in.readUTF());
 
